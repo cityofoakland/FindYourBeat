@@ -18,12 +18,12 @@ var MapsLib = {
 
   //the encrypted Table ID of your Fusion Table (found under File => About)
   //NOTE: numeric IDs will be depricated soon
-  fusionTableId:      "1VTHj1S7DH3DC8aXG0WMtsWK8EOfGSDP9X_8U52w",
-  tierDiffTableId:    "1c8_4xQV7Vw21m5kDZqnD7Kz_QCOdrlXyF_RU4gc",
+  fusionTableId:      "1Xz_0nkEFX9X8mqMiMISXomP_ClnHyTwG1tYycqs",
+  tierDiffTableId:    "1VTHj1S7DH3DC8aXG0WMtsWK8EOfGSDP9X_8U52w",
 
   //*New Fusion Tables Requirement* API key. found at https://code.google.com/apis/console/
   //*Important* this key is for demonstration purposes. please register your own.
-  googleApiKey:       "AIzaSyBiSQxYlSAn8B4fBNANuiOUDmf0Mv72MAY",
+  googleApiKey:       "AIzaSyBVYBT1xjYMVK5b7JHZDG6PgwTBTgnsYfQ",
 
   //name of the location column in your Fusion Table.
   //NOTE: if your location column name has spaces in it, surround it with single quotes
@@ -32,8 +32,8 @@ var MapsLib = {
 
   map_centroid:       new google.maps.LatLng(37.8044, -122.2697), //center that your map defaults to
   locationScope:      "Oakland, California",      //geographical area appended to all address searches
-  recordName:         "community police beat",       //for showing number of results
-  recordNamePlural:   "community police beats",
+  recordName:         "police district",       //for showing number of results
+  recordNamePlural:   "police districts",
 
   searchRadius:       0.0001,            //in meters ~ 1/2 mile
   defaultZoom:        12,             //zoom level when map is loaded (bigger is more zoomed in)
@@ -47,15 +47,18 @@ var MapsLib = {
     var myOptions = {
       zoom: MapsLib.defaultZoom,
       center: MapsLib.map_centroid,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      styleId: 2,
+      templateId: 2
     };
+
     map = new google.maps.Map($("#map_canvas")[0],myOptions);
 
 //adding new schools layer fro fusion table
 var layeres = new google.maps.FusionTablesLayer({
   query: {
-    select: 'street',
-    from: '1vFge162nQNKIaLIKati1K4860hipj_LXRNcF79w'
+    select: 'POL_BEAT',
+    from: '1ODymxKdxDTiARQ_aVA9uOBedEs5N84VqfAVbVEk'
   },
 });
 
@@ -82,7 +85,15 @@ var layeres = new google.maps.FusionTablesLayer({
       query: {
         from:   MapsLib.tierDiffTableId,
         select: MapsLib.locationColumn
-      }
+      },
+
+      
+      styles: {
+    polygonOptions: {
+      fillColor: "#ffffff",
+      fillOpacity: 0.1
+    }
+  }
     });
     MapsLib.searchrecords.setMap(map);
   },
@@ -207,7 +218,7 @@ var layeres = new google.maps.FusionTablesLayer({
 
   enableMapTips: function () {
     MapsLib.searchrecords.enableMapTips({
-      select: "CP_BEAT",
+      select: "'Contact Information'",
       from: MapsLib.fusionTableId,
       geometryColumn: MapsLib.locationColumn,
       googleApiKey: MapsLib.googleApiKey,
@@ -236,7 +247,7 @@ var layeres = new google.maps.FusionTablesLayer({
   },
 
   getTierNumber: function(whereClause) {
-    MapsLib.query("CP_BEAT", whereClause,"MapsLib.displayTierNumber");
+    MapsLib.query("'Contact Information'", whereClause,"MapsLib.displayTierNumber");
   },
 
   displayTierNumber: function(json) {
@@ -246,10 +257,12 @@ var layeres = new google.maps.FusionTablesLayer({
       tier = json["rows"][0];
 
     $( "#tierNumber" ).fadeOut(function() {
-        $( "#tierNumber" ).html("You are in Community Police Beat " + tier);
+        $( "#tierNumber" ).html("<div class='flash'><div class='confirm'>" + tier + "</div></div>");
       });
     $( "#tierNumber" ).fadeIn();
   },
+
+  
 
   getTierDemographics: function(tier) {
     var selectColumns = "AVERAGE('Tier 2012'), "

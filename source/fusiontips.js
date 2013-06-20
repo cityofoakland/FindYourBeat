@@ -251,7 +251,7 @@
         if (numRows > 0) {
           row = {};
           
-          html += "Community Police Beat " + data.rows[0][0];
+          html += "" + data.rows[0][0];
 
           for (i = 0; i < numCols; i++) {
             var cell = {
